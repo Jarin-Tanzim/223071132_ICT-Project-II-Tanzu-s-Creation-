@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script src="product_rotation.js"></script>
+
 </head>
 <body>
     
@@ -28,7 +29,8 @@
                         <li><a href="homepage.html" class="active">Home</a></li>
                         <li><a href="products.html">Products</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="login.html">Login</a></li>
+                        <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                        <li id="authLink"></li>
                     </ul>
                 </nav>
             </div>
@@ -58,38 +60,61 @@
 
    
     <main class="container">
-        <section class="featured">
-            <h2>Featured Products</h2>
-            <div class="products">
-                <div class="product-card">
-                    <img src="dress.png" alt="Trendy Dress">
-                    <h3>Trendy Dress</h3>
-                    <p class="price">400</p>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-                
-                <div class="product-card">
-                    <img src="bag.png" alt="Stylish Bag">
-                    <h3>Stylish Bag</h3>
-                    <p class="price">600</p>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-                
-                <div class="product-card">
-                    <img src="shoes.png" alt="Women Shoes">
-                    <h3>Women Shoes</h3>
-                    <p class="price">650</p>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-                
-                <div class="product-card">
-                    <img src="jewelry.png" alt="Gold Necklace">
-                    <h3>Gold Necklace</h3>
-                    <p class="price">180</p>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-        </section>
+    <section class="featured">
+        <h2>Featured Products</h2>
+        <div class="products">
+
+            <div class="product-card">
+    <img src="dress.png" alt="Trendy Dress">
+    <h3>Trendy Dress</h3>
+    <p class="price">400</p>
+    <button class="add-to-cart"
+            data-id="9"
+            data-name="Trendy Dress"
+            data-price="400"
+            data-image="dress.png">
+        Add to Cart
+    </button>
+</div>
+<div class="product-card">
+    <img src="bag.png" alt="Stylish Bag">
+    <h3>Stylish Bag</h3>
+    <p class="price">600</p>
+    <button class="add-to-cart"
+            data-id="10"
+            data-name="Stylish Bag"
+            data-price="600"
+            data-image="bag.png">
+        Add to Cart
+    </button>
+</div>
+<div class="product-card">
+    <img src="shoes.png" alt="Women Shoes">
+    <h3>Women Shoes</h3>
+    <p class="price">650</p>
+    <button class="add-to-cart"
+            data-id="11"
+            data-name="Women Shoes"
+            data-price="650"
+            data-image="shoes.png">
+        Add to Cart
+    </button>
+</div>
+<div class="product-card">
+    <img src="jewelry.png" alt="Gold Necklace">
+    <h3>Gold Necklace</h3>
+    <p class="price">180</p>
+    <button class="add-to-cart"
+            data-id="12"
+            data-name="Gold Necklace"
+            data-price="180"
+            data-image="jewelry.png">
+        Add to Cart
+    </button>
+</div>
+        </div>
+    </section>
+</main>
 
         
         <section class="about">
@@ -145,5 +170,20 @@
             </div>
         </div>
     </footer>
+    <script src="cart.js"></script>
+    <script src="status.js"></script>
+    <script src="products.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.role === 'admin' && !window.location.href.includes('admin.html')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        window.location.reload();
+    }
+});
+
+</script>
 </body>
 </html>
