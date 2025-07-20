@@ -43,11 +43,23 @@
                     <input type="password" id="password" name="password" placeholder="Password" required>
                     <div class="password-requirements">
                         <div class="password-requirement">
-                           
                             <span>At least 8 characters</span>
                         </div>
                     </div>
                     <small class="hint">Use a strong password</small>
+                </div>
+                <div class="form-group">
+                    <label for="security_question">Security Question</label>
+                    <select id="security_question" name="security_question" required>
+                        <option value="">Select a question...</option>
+                        <option value="What is your mother’s maiden name?">What is your mother’s maiden name?</option>
+                        <option value="What was your first pet’s name?">What was your first pet’s name?</option>
+                        <option value="What is your favorite color?">What is your favorite color?</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="security_answer">Your Answer</label>
+                    <input type="text" id="security_answer" name="security_answer" placeholder="Your answer" required>
                 </div>
                 <button type="submit" class="btn btn-auth">Create Account</button>
             </form>
@@ -64,32 +76,41 @@
     </footer>
 
     <script>
-        document.getElementById("signupForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const password = document.getElementById("password").value;
+        if (password.length < 8) {
+            alert("Password must be at least 8 characters.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById("username").value,
+                    email: document.getElementById("email").value,
+                    password: password,
+                    security_question: document.getElementById("security_question").value,
+                    security_answer: document.getElementById("security_answer").value
+                })
+            });
             
-            try {
-                const response = await fetch('http://localhost:3000/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: document.getElementById("username").value,
-                        email: document.getElementById("email").value,
-                        password: document.getElementById("password").value
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert("Account created successfully!");
-                    window.location.href = "login.html";
-                } else {
-                    alert(result.error || "Signup failed. Please try again.");
-                }
-            } catch (error) {
-                alert("Network error. Please check your connection.");
+            const result = await response.json();
+            
+            if (result.success) {
+                alert("Account created successfully!");
+                window.location.href = "login.html";
+            } else {
+                alert(result.error || "Signup failed. Please try again.");
             }
-        });
-    </script>
+        } catch (error) {
+            alert("Network error. Please check your connection.");
+        }
+    });
+</script>
+
 </body>
 </html>
