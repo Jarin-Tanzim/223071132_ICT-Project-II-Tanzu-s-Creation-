@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout | Tanzu's Creation</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #fff7f9;
+    margin: 0;
+  }
+
+  .checkout-container {
+    padding: 20px 10px;
+  }
+
+  .checkout-box {
+    display: flex;
+    flex-wrap: wrap;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    max-width: 960px;
+    margin: auto;
+    gap: 20px;
+  }
+
+  .checkout-summary,
+  .checkout-form {
+    flex: 1 1 300px;
+  }
+
+  h1, h2 {
+    color: #8a63ff;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  .checkout-summary p {
+    font-size: 15px;
+    margin: 6px 0;
+  }
+
+  .checkout-summary {
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+  }
+
+  .checkout-form form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .checkout-form input[type="text"],
+  .checkout-form input[type="email"],
+  .checkout-form input[type="tel"] {
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .payment-options {
+    margin: 16px 0 10px;
+  }
+
+  .payment-options label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .btn-checkout {
+    background-color: #8a63ff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-checkout:hover {
+    background-color: #7a55e0;
+  }
+
+  .order-message {
+    margin-top: 14px;
+    font-weight: bold;
+    color: green;
+  }
+
+  .order-items {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+  }
+
+  .order-items h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #555;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .discount-code {
+    margin-top: 15px;
+  }
+
+  .discount-code input {
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+
+  .discount-code button {
+    padding: 6px 12px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .discount-code button:hover {
+    background: #e0e0e0;
+  }
+
+  @media (max-width: 768px) {
+    .checkout-box {
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .checkout-summary {
+      border-right: none;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+      margin-bottom: 10px;
+    }
+  }
+</style>
+
+</head>
+<body>
+
+  <header class="main-header">
+    <div class="container">
+      <div class="logo">
+        <span class="logo-icon"><i class="fas fa-spa"></i></span>
+        <h1><a href="homepage.html">Tanzu's <span>Creation</span></a></h1>
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="homepage.html">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="checkout-container">
+    <div class="checkout-box">
+      
+      <!-- Order Summary -->
+      <section class="checkout-summary">
+        <h2>Order Summary</h2>
+        
+        <div class="order-items">
+          <h3>Your Items</h3>
+          <div id="cartItemsList" style="max-height: 200px; overflow-y: auto;">
+            <!-- Items will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <p><strong>Subtotal:</strong> <span id="summarySubtotal">0.00</span></p>
+        <p><strong>Shipping:</strong> <span id="summaryShipping">50.00</span></p>
+        <p><strong>Total:</strong> <span id="summaryTotal">50.00</span></p>
+        
+        <div class="discount-code">
+          <input type="text" id="discountCode" placeholder="Discount Code">
+          <button id="applyDiscount">Apply</button>
+        </div>
+      </section>
+
+      <!-- Checkout Form -->
+      <section class="checkout-form">
+        <h2>Shipping & Payment</h2>
+        <form id="orderForm">
+          <input type="text" placeholder="Full Name" required />
+          <input type="text" placeholder="Address" required />
+          <input type="email" placeholder="Email" required />
+          <input type="tel" placeholder="Phone Number" required />
+
+          <div class="payment-options">
+            <label><input type="radio" name="payment" value="COD" required /> Cash on Delivery</label>
+            <label><input type="radio" name="payment" value="bKash" /> bKash</label>
+            <label><input type="radio" name="payment" value="Card" /> Credit/Debit Card</label>
+          </div>
+
+          <button type="submit" class="btn-checkout">Place Order</button>
+        </form>
+
+        <div id="orderMessage" class="order-message"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <p>&copy; 2025 Tanzu's Creation. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  // ====== LOGIN GUARD: Require user to be logged in ======
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  if (!token || !user || !user.id) {
+    alert("Please log in before checking out.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shipping = 50;
+  let total = subtotal + shipping;
+  let discountApplied = false;
+
+  // Display order summary
+  document.getElementById("summarySubtotal").textContent = subtotal.toFixed(2);
+  document.getElementById("summaryShipping").textContent = shipping.toFixed(2);
+  document.getElementById("summaryTotal").textContent = total.toFixed(2);
+
+  // Display cart items
+  const cartItemsList = document.getElementById("cartItemsList");
+  if (cart.length > 0) {
+    cartItemsList.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <span>${item.name} × ${item.quantity}</span>
+        <span>৳${(item.price * item.quantity).toFixed(2)}</span>
+      </div>
+    `).join('');
+  } else {
+    cartItemsList.innerHTML = '<p style="color: #888;">Your cart is empty</p>';
+  }
+
+  // Discount code functionality
+  document.getElementById("applyDiscount").addEventListener("click", () => {
+    const code = document.getElementById("discountCode").value;
+    if (code === "TANZU10" && !discountApplied) {
+      total = total * 0.9; // 10% discount
+      document.getElementById("summaryTotal").textContent = total.toFixed(2);
+      alert("Discount applied! 10% off your order.");
+      discountApplied = true;
+    } else if (discountApplied) {
+      alert("Discount already applied.");
+    } else if (code) {
+      alert("Invalid discount code");
+    }
+  });
+
+  const form = document.getElementById("orderForm");
+  const message = document.getElementById("orderMessage");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
+
+    if (!paymentMethod) {
+      alert("Please select a payment method.");
+      return;
+    }
+
+    // Prepare order data for the server
+    const orderData = {
+      userId: user.id,
+      items: cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
+      totalAmount: subtotal,
+      shippingAmount: shipping,
+      paymentMethod: paymentMethod,
+      customerInfo: {
+        name: form.querySelector('input[placeholder="Full Name"]').value,
+        email: form.querySelector('input[type="email"]').value,
+        phone: form.querySelector('input[type="tel"]').value,
+        address: form.querySelector('input[placeholder="Address"]').value
+      }
+    };
+
+    try {
+      // Send order to server
+      const response = await fetch('http://localhost:3000/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Clear cart and show success
+        localStorage.removeItem("cart");
+        message.innerHTML = `
+          <div class="order-success">
+            <p>✅ Order placed successfully!</p>
+            <p>Your order number: <strong>${result.orderNumber}</strong></p>
+            <p>Payment method: <strong>${paymentMethod}</strong></p>
+          </div>
+        `;
+        
+        // Update UI
+        cartItemsList.innerHTML = '<p style="color: #888;">Your order has been placed</p>';
+        document.getElementById("summarySubtotal").textContent = "0.00";
+        document.getElementById("summaryTotal").textContent = "50.00";
+        form.reset();
+      } else {
+        throw new Error(result.error || 'Order failed');
+      }
+    } catch (error) {
+      console.error('Order error:', error);
+      message.innerHTML = `
+        <p style="color: red;">⚠️ Order failed. Please try again or contact support.</p>
+      `;
+    }
+  });
+});
+</script>
+
+</body>
+</html>
