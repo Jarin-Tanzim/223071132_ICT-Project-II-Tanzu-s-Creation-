@@ -20,7 +20,13 @@
                     <li><a href="homepage.html">Home</a></li>
                     <li><a href="products.html" class="active">Products</a></li>
                     <li><a href="contact.html">Contact</a></li>
-                    <li><a href="login.html">Login</a></li>
+                    <li id="authLink"></li>
+                    <li>
+                        <a href="cart.html">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <span class="cart-count"></span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -33,92 +39,168 @@
                     <h2>Our Handcrafted Jewelry</h2>
                 </div>
                 
-                <div class="products">
-                    
+                <!-- THE ONLY CHANGE: id="productsList" -->
+                <div class="products" id="productsList">
+                    <!-- Bracelet 1 -->
                     <div class="product-card">
                         <img src="Braclet 1.jpg" alt="Braclet 1">
                         <div class="product-info">
                             <h3>Braclet 1</h3>
                             <div class="price">160</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <button class="add-to-cart" 
+                                    data-id="1" 
+                                    data-name="Braclet 1" 
+                                    data-price="160" 
+                                    data-image="Braclet 1.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
+                    <!-- Bracelet 2 -->
                     <div class="product-card">
                         <img src="braclet 2.jpg" alt="Braclet 2">
                         <div class="product-info">
                             <h3>Braclet 2</h3>
                             <div class="price">150</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <button class="add-to-cart" 
+                                    data-id="2" 
+                                    data-name="Braclet 2" 
+                                    data-price="150" 
+                                    data-image="braclet 2.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
+                    <!-- Bracelet 3 -->
                     <div class="product-card">
                         <img src="braclet 3.jpg" alt="Braclet 3">
                         <div class="product-info">
                             <h3>Braclet 3</h3>
                             <div class="price">140</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <button class="add-to-cart" 
+                                    data-id="3" 
+                                    data-name="Braclet 3" 
+                                    data-price="140" 
+                                    data-image="braclet 3.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
+                    <!-- Bracelet 4 -->
                     <div class="product-card">
                         <img src="braclet 4.jpg" alt="Braclet 4">
                         <div class="product-info">
                             <h3>Braclet 4</h3>
                             <div class="price">145</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <button class="add-to-cart" 
+                                    data-id="4" 
+                                    data-name="Braclet 4" 
+                                    data-price="145" 
+                                    data-image="braclet 4.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
-                    
+                    <!-- Earring 1 -->
                     <div class="product-card">
                         <img src="Ear 1.jpg" alt="Earring 1">
                         <div class="product-info">
                             <h3>Earring 1</h3>
-                            <div class="price">₹50</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <div class="price">50</div>
+                            <button class="add-to-cart" 
+                                    data-id="5" 
+                                    data-name="Earring 1" 
+                                    data-price="50" 
+                                    data-image="Ear 1.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
+                    <!-- Earring 2 -->
                     <div class="product-card">
                         <img src="Ear 2.jpg" alt="Earring 2">
                         <div class="product-info">
                             <h3>Earring 2</h3>
                             <div class="price">130</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <button class="add-to-cart" 
+                                    data-id="6" 
+                                    data-name="Earring 2" 
+                                    data-price="130" 
+                                    data-image="Ear 2.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
-                   
+                    <!-- Earring 3 -->
                     <div class="product-card">
                         <img src="Ear 3.jpg" alt="Earring 3">
                         <div class="product-info">
                             <h3>Earring 3</h3>
                             <div class="price">140</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <button class="add-to-cart" 
+                                    data-id="7" 
+                                    data-name="Earring 3" 
+                                    data-price="140" 
+                                    data-image="Ear 3.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
-                    
+                    <!-- Earring 4 -->
                     <div class="product-card">
                         <img src="Ear 4.jpg" alt="Earring 4">
                         <div class="product-info">
                             <h3>Earring 4</h3>
-                            <div class="price">₹150</div>
-                            <button class="add-to-cart">Add to Cart</button>
+                            <div class="price">150</div>
+                            <button class="add-to-cart" 
+                                    data-id="8" 
+                                    data-name="Earring 4" 
+                                    data-price="150" 
+                                    data-image="Ear 4.jpg">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
+                    <!-- New products will be loaded here dynamically by JS -->
                 </div>
-                
-                
             </div>
         </section>
     </main>
 
     <footer class="main-footer">
         <div class="container">
-            <p>&copy; 2025 Tanzu's Creation. All Rights Reserved.</p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="homepage.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <p><i class="fas fa-envelope"></i> contact@tanzuscreation.com</p>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/tanzim26190" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/TanzusCreation" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Tanzu's Creation. All Rights Reserved.</p>
+            </div>
         </div>
     </footer>
+
+    <script src="cart.js"></script>
+    <script src="status.js"></script>
+    <script src="products.js"></script>
+    
+
 </body>
 </html>
