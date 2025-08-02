@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span style="margin-right: 10px;">Welcome, <b>${user.username}</b></span>
                 <a href="#" id="logoutBtn">Logout</a>
             `;
+            
+           
             document.getElementById("logoutBtn").addEventListener("click", (e) => {
                 e.preventDefault();
                 localStorage.removeItem("token");
@@ -17,9 +19,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.removeItem("cart");
                 window.location.href = "login.html";
             });
+
+           
+            const navMenu = document.querySelector('.main-nav ul');
+            
+            
+            const existingOrdersLink = document.querySelector('a[href="orders.html"]');
+            
+           
+            if (navMenu && !existingOrdersLink) {
+              
+                const ordersItem = document.createElement('li');
+                ordersItem.innerHTML = '<a href="orders.html">My Orders</a>';
+                
+              
+                const authListItem = authLink.closest('li');
+                if (authListItem) {
+                    navMenu.insertBefore(ordersItem, authListItem);
+                } else {
+                    navMenu.appendChild(ordersItem);
+                }
+            }
         } else {
-            // Show login link if not logged in
+            
             authLink.innerHTML = `<a href="login.html">Login</a>`;
+            
+            
+            const ordersLink = document.querySelector('a[href="orders.html"]');
+            if (ordersLink) {
+                ordersLink.closest('li').remove();
+            }
         }
     }
 });
