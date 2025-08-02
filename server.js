@@ -315,3 +315,117 @@ app.put('/admin/products/:id', (req, res) => {
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
+
+// Save contact message
+app.post('/contact', (req, res) => {
+  const { name, email, phone, message } = req.body;
+  db.query(
+    'INSERT INTO messages (name, email, phone, message) VALUES (?, ?, ?, ?)',
+    [name, email, phone, message],
+    (err, result) => {
+      if (err) return res.status(500).json({ success: false, error: 'Message saving failed' });
+      res.json({ success: true });
+    }
+  );
+});
+
+// Admin get messages
+app.get('/admin/messages', (req, res) => {
+  db.query('SELECT * FROM messages ORDER BY created_at DESC', (err, results) => {
+    if (err) return res.status(500).json({ success: false, error: 'Failed to fetch messages' });
+    res.json(results);
+  });
+});
+// Admin updates order status
+app.put('/admin/orders/:id/status', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    db.query('UPDATE orders SET status = ? WHERE id = ?', [status, id], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ success: true });
+    });
+});
+
+
+app.get('/orders/me', (req, res) => {
+  const userId = req.query.userId;
+  console.log("GET /orders/me hit with userId:", userId);
+
+  if (!userId) {
+    console.log("Missing user ID");
+    return res.status(400).json({ error: 'Missing user ID' });
+  }
+
+  const orderQuery = `
+    SELECT 
+      id AS order_id,
+      order_number,
+      DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+      total_amount,
+      shipping_amount,
+      status
+    FROM orders
+    WHERE user_id = ?
+    ORDER BY created_at DESC
+  `;
+
+  db.query(orderQuery, [userId], (err, orders) => {
+    if (err) {
+      console.error('Order query error:', err);
+      return res.status(500).json({ error: 'Database error fetching orders' });
+    }
+
+    if (orders.length === 0) {
+      console.log("No orders found for userId:", userId);
+      return res.json([]);
+    }
+
+    const orderIds = orders.map(o => o.order_id);
+    console.log("Found orders:", orderIds);
+
+   
+    const itemsQuery = `
+      SELECT 
+        oi.order_id,
+        p.name,
+        p.image_url,
+        oi.quantity,
+        oi.unit_price AS price
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      WHERE oi.order_id IN (?)
+    `;
+
+    db.query(itemsQuery, [orderIds], (err, items) => {
+      if (err) {
+        console.error('Item query error:', err);
+        return res.status(500).json({ error: 'Database error fetching items' });
+      }
+
+      const itemsByOrder = {};
+      for (const item of items) {
+        if (!itemsByOrder[item.order_id]) {
+          itemsByOrder[item.order_id] = [];
+        }
+        itemsByOrder[item.order_id].push({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          image: item.image_url || '' 
+        });
+      }
+
+      const fullOrders = orders.map(order => ({
+        ...order,
+        items: itemsByOrder[order.order_id] || []
+      }));
+
+      console.log("Returning orders:", fullOrders.length);
+      res.json(fullOrders);
+    });
+  });
+});
