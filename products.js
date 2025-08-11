@@ -1,43 +1,112 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Initialize quantity controls for static products
+        // First initialize static products
         initQuantityControls();
-        
-        // Fetch and display dynamic products
-        await loadDynamicProducts();
-        
-        // Initialize cart functionality
         setupAddToCart();
-        
-        // Update cart count display
         updateCartCount();
-
+        
+        // Then try to load admin products
+        await loadAdminProducts();
+        
     } catch (error) {
-        console.error('Error initializing products:', error);
-        showErrorNotification();
+        console.error('Error:', error);
+        // Even if this fails, static products remain visible
     }
 });
 
-// Initialize quantity controls for all product cards
+async function loadAdminProducts() {
+    try {
+        const response = await fetch('http://localhost:3000/admin/products', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const adminProducts = await response.json();
+        addAdminProducts(adminProducts);
+        
+    } catch (error) {
+        console.error('Failed to load admin products:', error);
+        showErrorNotification('Could not load additional products. Showing standard collection.');
+    }
+}
+
+function addAdminProducts(adminProducts) {
+    const productsContainer = document.getElementById('productsList');
+    if (!productsContainer) return;
+    
+    // Get IDs of existing products
+    const existingIds = new Set(
+        Array.from(document.querySelectorAll('.product-card .add-to-cart'))
+            .map(btn => parseInt(btn.dataset.id))
+    );
+    
+    // Filter and add new products
+    adminProducts.forEach(product => {
+        if (!existingIds.has(product.id)) {
+            const productCard = createProductCard({
+                id: product.id,
+                name: product.name,
+                price: parseFloat(product.price), // Ensure price is a number
+                image: product.image_url
+            });
+            productsContainer.appendChild(productCard);
+        }
+    });
+    
+    // Reinitialize controls for new products
+    initQuantityControls();
+    setupAddToCart();
+}
+
+function createProductCard(product) {
+    const imageUrl = product.image || 'https://via.placeholder.com/300';
+    const price = typeof product.price === 'number' ? product.price : parseFloat(product.price) || 0;
+    
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+        <img src="${imageUrl}" alt="${product.name}" loading="lazy">
+        <div class="product-info">
+            <h3>${product.name}</h3>
+            <div class="price">$${price.toFixed(2)}</div>
+            <div class="quantity-controls">
+                <button class="quantity-btn minus">-</button>
+                <span class="quantity">1</span>
+                <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart"
+                data-id="${product.id}"
+                data-name="${product.name}"
+                data-price="${price}"
+                data-image="${imageUrl}">
+                Add to Cart
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+// Rest of your functions remain the same...
 function initQuantityControls() {
     document.querySelectorAll('.product-card').forEach(card => {
         const minusBtn = card.querySelector('.minus');
         const plusBtn = card.querySelector('.plus');
         const quantityDisplay = card.querySelector('.quantity');
         
-        // Set initial quantity
         let quantity = 1;
-        quantityDisplay.textContent = quantity;
-
-        // Minus button click handler
+        
         minusBtn.addEventListener('click', () => {
             if (quantity > 1) {
                 quantity--;
                 quantityDisplay.textContent = quantity;
             }
         });
-
-        // Plus button click handler
+        
         plusBtn.addEventListener('click', () => {
             quantity++;
             quantityDisplay.textContent = quantity;
@@ -45,89 +114,6 @@ function initQuantityControls() {
     });
 }
 
-// Load dynamic products from backend
-async function loadDynamicProducts() {
-    try {
-        // Get IDs of static products
-        const staticProductIds = Array.from(document.querySelectorAll('.product-card .add-to-cart'))
-            .map(btn => parseInt(btn.dataset.id, 10));
-
-        // Fetch products from backend
-        const response = await fetch('http://localhost:3000/admin/products');
-        if (!response.ok) throw new Error('Failed to fetch products');
-        
-        const products = await response.json();
-        const newProducts = products.filter(prod => !staticProductIds.includes(prod.id));
-
-        // Add new products to the page
-        if (newProducts.length > 0) {
-            addProductsToPage(newProducts);
-        }
-    } catch (error) {
-        console.error('Error loading dynamic products:', error);
-        throw error;
-    }
-}
-
-// Add products to the page
-function addProductsToPage(products) {
-    const productsList = document.getElementById('productsList');
-    
-    products.forEach(product => {
-        const imageUrl = product.image_url || 'https://via.placeholder.com/180';
-        
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-            <img src="${imageUrl}" alt="${product.name}" loading="lazy">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <div class="price">$${product.price.toFixed(2)}</div>
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
-                <button class="add-to-cart"
-                    data-id="${product.id}"
-                    data-name="${product.name}"
-                    data-price="${product.price}"
-                    data-image="${imageUrl}">
-                    Add to Cart
-                </button>
-            </div>
-        `;
-        
-        productsList.appendChild(card);
-        
-        // Initialize quantity controls for the new product
-        initQuantityControlsForCard(card);
-    });
-}
-
-// Initialize quantity controls for a single product card
-function initQuantityControlsForCard(card) {
-    const minusBtn = card.querySelector('.minus');
-    const plusBtn = card.querySelector('.plus');
-    const quantityDisplay = card.querySelector('.quantity');
-    
-    let quantity = 1;
-    quantityDisplay.textContent = quantity;
-
-    minusBtn.addEventListener('click', () => {
-        if (quantity > 1) {
-            quantity--;
-            quantityDisplay.textContent = quantity;
-        }
-    });
-
-    plusBtn.addEventListener('click', () => {
-        quantity++;
-        quantityDisplay.textContent = quantity;
-    });
-}
-
-// Setup add to cart functionality
 function setupAddToCart() {
     document.addEventListener('click', function(event) {
         if (event.target.classList.contains('add-to-cart')) {
@@ -152,11 +138,9 @@ function setupAddToCart() {
     });
 }
 
-// Add item to cart
 function addToCart(product) {
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     
-    // Check if product already exists in cart
     const existingItem = cart.find(item => item.id === product.id);
     
     if (existingItem) {
@@ -169,7 +153,6 @@ function addToCart(product) {
     updateCartCount();
 }
 
-// Show feedback when item is added to cart
 function showAddedFeedback(button) {
     const originalText = button.textContent;
     button.textContent = "✓ Added!";
@@ -181,7 +164,6 @@ function showAddedFeedback(button) {
     }, 2000);
 }
 
-// Update cart count in header
 function updateCartCount() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -191,13 +173,10 @@ function updateCartCount() {
     });
 }
 
-// Show error notification
-function showErrorNotification() {
+function showErrorNotification(message = 'There was an error loading products.') {
     const notification = document.createElement('div');
     notification.className = 'error-notification';
-    notification.innerHTML = `
-        <p>There was an error loading products. Please try again later.</p>
-    `;
+    notification.innerHTML = `<p>${message}</p>`;
     document.body.appendChild(notification);
     
     setTimeout(() => {
