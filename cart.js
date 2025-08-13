@@ -2,10 +2,20 @@ document.addEventListener('DOMContentLoaded', () => {
     ensureCartExists();
     updateCartCount();
 
-    // Initialize product page functionality if we're on a product page
+    // Check if we're on homepage
+    const isHomepage = document.querySelector('.hero') !== null;
+    
+    // Initialize product page functionality
     if (document.querySelector('.product-card')) {
-        initQuantityControls();
-        setupAddToCart();
+        if (isHomepage) {
+            // On homepage: hide quantity controls and setup direct add to cart
+            hideQuantityControlsOnHomepage();
+            setupDirectAddToCart();
+        } else {
+            // On products page: full functionality with quantity controls
+            initQuantityControls();
+            setupAddToCart();
+        }
     }
 
     // Initialize cart page functionality if we're on the cart page
@@ -15,6 +25,40 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCheckoutButton();
     }
 });
+
+// Hide quantity controls on homepage featured products
+function hideQuantityControlsOnHomepage() {
+    const quantityControls = document.querySelectorAll('.featured .quantity-controls');
+    quantityControls.forEach(control => {
+        control.style.display = 'none';
+    });
+}
+
+// Direct add to cart for homepage (always adds quantity 1)
+function setupDirectAddToCart() {
+    document.removeEventListener('click', handleDirectAddToCart);
+    document.addEventListener('click', handleDirectAddToCart);
+}
+
+function handleDirectAddToCart(e) {
+    if (!e.target.classList.contains('add-to-cart')) return;
+    
+    // Only handle homepage featured products
+    if (!e.target.closest('.featured')) return;
+    
+    const button = e.target;
+    const product = {
+        id: parseInt(button.dataset.id, 10),
+        name: button.dataset.name,
+        price: parseFloat(button.dataset.price),
+        image: button.dataset.image,
+        quantity: 1 // Always add 1 item from homepage
+    };
+
+    addToCart(product, { mode: 'add' }); // Use 'add' mode to accumulate
+    showAddedFeedback(button);
+    updateCartCount();
+}
 
 // Core cart functions
 function ensureCartExists() {
@@ -35,12 +79,9 @@ function onCartPage() {
     return document.querySelector('.cart-container') !== null;
 }
 
-// Quantity handling with event delegation
+// Quantity handling with event delegation (for products page)
 function initQuantityControls() {
-    // Remove any existing listener first
     document.removeEventListener('click', handleQuantityClick);
-    
-    // Add single delegated listener
     document.addEventListener('click', handleQuantityClick);
 }
 
@@ -62,17 +103,17 @@ function handleQuantityClick(e) {
     quantityElement.textContent = quantity;
 }
 
-// Add to cart functionality with event delegation
+// Add to cart functionality (for products page with quantity selection)
 function setupAddToCart() {
-    // Remove any existing listener first
     document.removeEventListener('click', handleAddToCart);
-    
-    // Add single delegated listener
     document.addEventListener('click', handleAddToCart);
 }
 
 function handleAddToCart(e) {
     if (!e.target.classList.contains('add-to-cart')) return;
+    
+    // Skip if this is a featured product (handled by direct add)
+    if (e.target.closest('.featured')) return;
     
     const button = e.target;
     const productCard = button.closest('.product-card');
@@ -103,7 +144,7 @@ function addToCart(product, { mode = 'replace' } = {}) {
     if (existingItem) {
         if (mode === 'replace') {
             existingItem.quantity = product.quantity;
-        } else {
+        } else { // mode === 'add'
             existingItem.quantity += product.quantity;
         }
     } else {
@@ -139,7 +180,7 @@ function displayCart() {
                 <i class="fas fa-shopping-cart" style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;"></i>
                 <h2 style="margin-bottom: 15px; color: #333;">Your cart is empty</h2>
                 <p style="margin-bottom: 30px; font-size: 1.1em;">Looks like you haven't added any items yet</p>
-                <a href="products.html" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; background: #2c5530; color: white; text-decoration: none; border-radius: 5px; transition: background 0.3s;">Browse Products</a>
+                <a href="products.html" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; background: #8864fc; color: white; text-decoration: none; border-radius: 5px; transition: background 0.3s;">Browse Products</a>
             </div>
         `;
         if (summary) summary.style.display = 'none';
@@ -155,7 +196,7 @@ function displayCart() {
             </div>
             <div class="item-details" style="flex: 1;">
                 <h3 style="margin: 0 0 10px 0; color: #333; font-size: 1.2em;">${item.name}</h3>
-                <p class="item-price" style="margin: 0 0 10px 0; font-size: 1.1em; font-weight: bold; color: #2c5530;">$${item.price.toFixed(2)}</p>
+                <p class="item-price" style="margin: 0 0 10px 0; font-size: 1.1em; font-weight: bold; color: #8864fc;">$${item.price.toFixed(2)}</p>
                 <div class="item-quantity" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                     <button class="quantity-btn minus" style="background: #f0f0f0; border: 1px solid #ddd; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
                     <span class="quantity" style="min-width: 30px; text-align: center; font-weight: bold; font-size: 1.1em;">${item.quantity}</span>
@@ -178,7 +219,6 @@ function updateSummary() {
     const shipping = 50; // Flat rate shipping
     const total = subtotal + shipping;
 
-    // Update the summary values in your HTML structure
     const subtotalEl = document.getElementById('subtotal');
     const shippingEl = document.getElementById('shipping');
     const totalEl = document.getElementById('total');
@@ -207,7 +247,6 @@ function setupCartButtons() {
             if (item.quantity > 1) {
                 item.quantity -= 1;
             } else {
-                // Remove item if quantity would go to 0
                 const index = cart.indexOf(item);
                 cart.splice(index, 1);
             }
@@ -244,28 +283,23 @@ function setupCheckoutButton() {
         
         const cart = getCart();
         
-        // Check if cart is empty
         if (cart.length === 0) {
             showNotification('Your cart is empty! Add some products first.', 'warning');
             return;
         }
 
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         const isLoggedIn = !!token;
 
         if (!isLoggedIn) {
-            // Show styled modal instead of basic confirm
             showLoginModal();
         } else {
-            // User is logged in, proceed to checkout
             window.location.href = 'checkout.html';
         }
     });
 }
 
 function showLoginModal() {
-    // Remove existing modal if any
     const existingModal = document.querySelector('.login-modal');
     if (existingModal) existingModal.remove();
 
@@ -289,7 +323,6 @@ function showLoginModal() {
 
     document.body.appendChild(modal);
 
-    // Add event listeners
     modal.querySelector('.modal-cancel').addEventListener('click', () => {
         modal.remove();
     });
@@ -306,7 +339,6 @@ function showLoginModal() {
     });
 }
 
-// Helper function to show notifications
 function showNotification(message, type = 'info') {
     const existingNotification = document.querySelector('.notification');
     if (existingNotification) existingNotification.remove();
@@ -315,7 +347,7 @@ function showNotification(message, type = 'info') {
     notification.className = `notification notification-${type}`;
     
     const colors = {
-        info: '#3498db',
+        info: '#8864fc',
         success: '#27ae60', 
         warning: '#f39c12',
         error: '#e74c3c'
@@ -353,7 +385,6 @@ function showNotification(message, type = 'info') {
 
     document.body.appendChild(notification);
 
-    // Auto remove after 5 seconds
     setTimeout(() => {
         if (notification.parentNode) {
             notification.remove();
