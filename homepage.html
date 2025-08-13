@@ -31,7 +31,7 @@
                         <li><a href="products.html">Products</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="orders.html">My Orders</a></li>
-                        <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                        <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count"></span></a></li>
                         <li id="authLink"></li>
                     </ul>
                 </nav>
@@ -68,12 +68,7 @@
             <div class="product-card">
                 <img src="dress.png" alt="Trendy Dress">
                 <h3>Trendy Dress</h3>
-                <p class="price">400</p>
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
+                <p class="price">$400</p>
                 <button class="add-to-cart"
                         data-id="9"
                         data-name="Trendy Dress"
@@ -86,12 +81,7 @@
             <div class="product-card">
                 <img src="bag.png" alt="Stylish Bag">
                 <h3>Stylish Bag</h3>
-                <p class="price">600</p>
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
+                <p class="price">$600</p>
                 <button class="add-to-cart"
                         data-id="10"
                         data-name="Stylish Bag"
@@ -104,12 +94,7 @@
             <div class="product-card">
                 <img src="shoes.png" alt="Women Shoes">
                 <h3>Women Shoes</h3>
-                <p class="price">650</p>
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
+                <p class="price">$650</p>
                 <button class="add-to-cart"
                         data-id="11"
                         data-name="Women Shoes"
@@ -122,12 +107,7 @@
             <div class="product-card">
                 <img src="jewelry.png" alt="Gold Necklace">
                 <h3>Gold Necklace</h3>
-                <p class="price">180</p>
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
+                <p class="price">$180</p>
                 <button class="add-to-cart"
                         data-id="12"
                         data-name="Gold Necklace"
@@ -194,14 +174,14 @@
             </div>
         </div>
     </footer>
-
+    
     <script src="status.js"></script>
-    <script src="products.js"></script>
+    <script src="cart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && user.role === 'admin' && !window.location.href.includes('admin.html')) {
-        localStorage.removeItem('token');
+        localStorage.removeUser('token');
         localStorage.removeItem('user');
         
         window.location.reload();
@@ -210,6 +190,6 @@
 
 </script>
 
+
 </body>
 </html>
-
