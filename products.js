@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // First initialize static products
+        // Initialize static products ONCE
         initQuantityControls();
         setupAddToCart();
         updateCartCount();
@@ -58,9 +58,8 @@ function addAdminProducts(adminProducts) {
         }
     });
     
-    // Reinitialize controls for new products
-    initQuantityControls();
-    setupAddToCart();
+    // DON'T reinitialize - the existing event listeners will handle new elements
+    // The event listeners are already set up with event delegation
 }
 
 function createProductCard(product) {
@@ -91,51 +90,61 @@ function createProductCard(product) {
     return card;
 }
 
-// Rest of your functions remain the same...
+// Use event delegation to handle all quantity controls
 function initQuantityControls() {
-    document.querySelectorAll('.product-card').forEach(card => {
-        const minusBtn = card.querySelector('.minus');
-        const plusBtn = card.querySelector('.plus');
-        const quantityDisplay = card.querySelector('.quantity');
-        
-        let quantity = 1;
-        
-        minusBtn.addEventListener('click', () => {
-            if (quantity > 1) {
-                quantity--;
-                quantityDisplay.textContent = quantity;
-            }
-        });
-        
-        plusBtn.addEventListener('click', () => {
-            quantity++;
-            quantityDisplay.textContent = quantity;
-        });
-    });
+    // Remove any existing listeners first
+    document.removeEventListener('click', handleQuantityClick);
+    
+    // Add single delegated listener
+    document.addEventListener('click', handleQuantityClick);
+}
+
+function handleQuantityClick(e) {
+    if (!e.target.classList.contains('quantity-btn')) return;
+    
+    const card = e.target.closest('.product-card');
+    if (!card) return;
+    
+    const quantityDisplay = card.querySelector('.quantity');
+    let quantity = parseInt(quantityDisplay.textContent);
+    
+    if (e.target.classList.contains('minus') && quantity > 1) {
+        quantity--;
+    } else if (e.target.classList.contains('plus')) {
+        quantity++;
+    }
+    
+    quantityDisplay.textContent = quantity;
 }
 
 function setupAddToCart() {
-    document.addEventListener('click', function(event) {
-        if (event.target.classList.contains('add-to-cart')) {
-            const button = event.target;
-            const card = button.closest('.product-card');
-            const quantity = parseInt(card.querySelector('.quantity').textContent, 10);
-            
-            const product = {
-                id: parseInt(button.dataset.id, 10),
-                name: button.dataset.name,
-                price: parseFloat(button.dataset.price),
-                image: button.dataset.image,
-                quantity: quantity
-            };
+    // Remove any existing listeners first
+    document.removeEventListener('click', handleAddToCart);
+    
+    // Add single delegated listener
+    document.addEventListener('click', handleAddToCart);
+}
 
-            addToCart(product);
-            showAddedFeedback(button);
-            
-            // Reset quantity to 1 after adding to cart
-            card.querySelector('.quantity').textContent = '1';
-        }
-    });
+function handleAddToCart(event) {
+    if (!event.target.classList.contains('add-to-cart')) return;
+    
+    const button = event.target;
+    const card = button.closest('.product-card');
+    const quantity = parseInt(card.querySelector('.quantity').textContent, 10);
+    
+    const product = {
+        id: parseInt(button.dataset.id, 10),
+        name: button.dataset.name,
+        price: parseFloat(button.dataset.price),
+        image: button.dataset.image,
+        quantity: quantity
+    };
+
+    addToCart(product);
+    showAddedFeedback(button);
+    
+    // Reset quantity to 1 after adding to cart
+    card.querySelector('.quantity').textContent = '1';
 }
 
 function addToCart(product) {
